@@ -47,6 +47,11 @@ print('Loading model checkpoint weights')
 saver=tf.train.Saver(max_to_keep=1000)
 saver.restore(sess, args.checkpoint_path)
 
+# print('Loading model checkpoint weights')
+# temp ="./checkpoints/"
+# saver = tf.train.import_meta_graph(temp + args.checkpoint_path)
+# saver.restore(sess, tf.train.latest_checkpoint(temp))
+
 
 print("Testing image " + args.image)
 
