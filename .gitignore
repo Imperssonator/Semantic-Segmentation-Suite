@@ -13,3 +13,9 @@ loss_vs_epochs.png
 colour_codes.csv
 CamVid_train.tfrecords
 tfrecords.py
+
+*.png
+*.jpeg
+*.jpg
+
+.DS_Store
