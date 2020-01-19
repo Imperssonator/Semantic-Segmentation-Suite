@@ -5,6 +5,7 @@ import tensorflow.contrib.slim as slim
 import numpy as np
 import time, datetime
 import os, random
+from pathlib import Path
 from scipy.misc import imread
 import ast
 from sklearn.metrics import precision_score, \
@@ -14,35 +15,22 @@ from sklearn.metrics import precision_score, \
 from utils import helpers
 
 def prepare_data(dataset_dir):
-    train_input_names=[]
-    train_output_names=[]
-    val_input_names=[]
-    val_output_names=[]
-    test_input_names=[]
-    test_output_names=[]
-    for file in os.listdir(dataset_dir + "/train"):
-        cwd = os.getcwd()
-        train_input_names.append(cwd + "/" + dataset_dir + "/train/" + file)
-    for file in os.listdir(dataset_dir + "/train_labels"):
-        cwd = os.getcwd()
-        train_output_names.append(cwd + "/" + dataset_dir + "/train_labels/" + file)
-    for file in os.listdir(dataset_dir + "/val"):
-        cwd = os.getcwd()
-        val_input_names.append(cwd + "/" + dataset_dir + "/val/" + file)
-    for file in os.listdir(dataset_dir + "/val_labels"):
-        cwd = os.getcwd()
-        val_output_names.append(cwd + "/" + dataset_dir + "/val_labels/" + file)
-    for file in os.listdir(dataset_dir + "/test"):
-        cwd = os.getcwd()
-        test_input_names.append(cwd + "/" + dataset_dir + "/test/" + file)
-    for file in os.listdir(dataset_dir + "/test_labels"):
-        cwd = os.getcwd()
-        test_output_names.append(cwd + "/" + dataset_dir + "/test_labels/" + file)
+
+    train_input_names = [os.path.join(dataset_dir,"train",file) for file in os.listdir(os.path.join(dataset_dir,"train"))]
+    train_output_names = [os.path.join(dataset_dir,"train_labels",file) for file in os.listdir(os.path.join(dataset_dir,"train_labels"))]
+    val_input_names = [os.path.join(dataset_dir,"val",file) for file in os.listdir(os.path.join(dataset_dir,"val"))]
+    val_output_names = [os.path.join(dataset_dir,"val_labels",file) for file in os.listdir(os.path.join(dataset_dir,"val_labels"))]
+    test_input_names = [os.path.join(dataset_dir,"test",file) for file in os.listdir(os.path.join(dataset_dir,"test"))]
+    test_output_names = [os.path.join(dataset_dir,"test_labels",file) for file in os.listdir(os.path.join(dataset_dir,"test_labels"))]
+
     train_input_names.sort(),train_output_names.sort(), val_input_names.sort(), val_output_names.sort(), test_input_names.sort(), test_output_names.sort()
     return train_input_names,train_output_names, val_input_names, val_output_names, test_input_names, test_output_names
 
 def load_image(path):
-    image = cv2.cvtColor(cv2.imread(path,-1), cv2.COLOR_BGR2RGB)
+    try:
+        image = cv2.cvtColor(cv2.imread(path,-1), cv2.COLOR_BGR2RGB)
+    except:
+        print("{} failed to load".format(path))
     return image
 
 # Takes an absolute file path and returns the name of the file without th extension

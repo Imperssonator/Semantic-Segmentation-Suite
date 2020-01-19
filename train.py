@@ -47,6 +47,7 @@ parser.add_argument('--model', type=str, default="FC-DenseNet56", help='The mode
 parser.add_argument('--frontend', type=str, default="ResNet101", help='The frontend you are using. See frontend_builder.py for supported models')
 args = parser.parse_args()
 
+DATASET_NAME = os.path.basename(args.dataset)
 
 def data_augmentation(input_image, output_image):
     # Data augmentation
@@ -72,7 +73,10 @@ def data_augmentation(input_image, output_image):
     return input_image, output_image
 
 
-# Get the names of the classes so we can record the evaluation results
+#############################
+### PARSE THE CLASS NAMES ###
+#############################
+
 class_names_list, label_values = helpers.get_label_info(os.path.join(args.dataset, "class_dict.csv"))
 class_names_string = ""
 for class_name in class_names_list:
@@ -83,12 +87,20 @@ for class_name in class_names_list:
 
 num_classes = len(label_values)
 
+
+############################
+### CONFIGURE TENSORFLOW ###
+############################
+
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 sess=tf.Session(config=config)
 
 
-# Compute your softmax cross entropy loss
+############################
+### BUILD MODEL AND LOSS ###
+############################
+
 net_input = tf.placeholder(tf.float32,shape=[None,None,None,3])
 net_output = tf.placeholder(tf.float32,shape=[None,None,None,num_classes])
 
@@ -103,13 +115,14 @@ sess.run(tf.global_variables_initializer())
 
 utils.count_params()
 
+
 # If a pre-trained ResNet is required, load the weights.
 # This must be done AFTER the variables are initialized with sess.run(tf.global_variables_initializer())
 if init_fn is not None:
     init_fn(sess)
 
 # Load a previous checkpoint if desired
-model_checkpoint_name = "checkpoints/latest_model_" + args.model + "_" + args.dataset + ".ckpt"
+model_checkpoint_name = "./checkpoints/latest_model_" + args.model + "_" + DATASET_NAME + ".ckpt"
 if args.continue_training:
     print('Loaded latest model checkpoint')
     saver.restore(sess, model_checkpoint_name)
